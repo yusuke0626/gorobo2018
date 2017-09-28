@@ -15,7 +15,8 @@ using namespace RPMS;
 
 int main(void){
   
-  DualShock3 controller;
+  DualShock3 controller2("/dev/input/js1", false, 0);
+  DualShock3 controller("/dev/input/js0", false, 0);
   MotorSerial ms;
 
   double regulation = 1;  //減速倍率
@@ -41,7 +42,13 @@ int main(void){
   digitalWrite(RunLED, 1);
   //STARTボタンが押されるまで実行
   UPDATELOOP(controller, !(controller.button(START) && controller.button(RIGHT))){ 
-
+  controller2.update();
+  if(controller.button(UP)){
+    puts("1");
+  }
+  if(controller2.button(UP)){
+    puts("2");
+  }
  
     if(controller.button(L1))
       regulation = 0.50;
@@ -100,6 +107,7 @@ int main(void){
     moter_h = 1 + creg;
     moter_l = 1 - creg;
 
+/*
     if(controller.button(RI) == 1){
       ms.send(6, 2, right_x);
       ms.send(6, 3, ri
@@ -108,7 +116,7 @@ int main(void){
       ms.send(5, 2, -left_w * lb * moter_h * regulation);//右前 
       ms.send(5, 3,  left_w * lf * moter_h * regulation);//右後
       cout << left_w << endl;
-
+*/
   }
   cout << "プログラム終了" << endl;
   digitalWrite(RunLED, 0);
