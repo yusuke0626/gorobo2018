@@ -37,7 +37,8 @@ int main(void){
 
 
   pinMode(RunLED, OUTPUT);
-  
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
 
   digitalWrite(RunLED, 1);
   //STARTボタンが押されるまで実行
@@ -50,6 +51,12 @@ int main(void){
     else
       regulation = 1;
 
+    //刀x軸
+    int x = 0;
+    x = controller.stick(RIGHT_T);
+
+    ms.send(7, 4, x * 0.2);
+   
     //刀y軸
     if(controller2.button(RIGHT)){
       ms.send(7, 2, 30);
@@ -63,6 +70,19 @@ int main(void){
     }else if(controller2.button(DOWN)){
       ms.send(7, 3, -30);
     }
+
+    if(controller.button(SQUARE)){
+      digitalWrite(6, 1);
+    }else{
+      digitalWrite(6, 0);
+    }
+
+    if(controller.button(CIRCLE)){
+      digitalWrite(5, 1);
+    }else{
+      digitalWrite(5, 0);
+    }
+
   
    //全モーターの非常停止。SELECTを押すと作動、もう一度押すと解除
     if(controller.press(SELECT)){
