@@ -91,22 +91,23 @@ int main(void){
       lf = (left_theta * 4 / M_PI) - 7;
     }
 
-    double right_x = 0;
+    float right_x = 0;
+    float creg = 0;
+    float moter_h = 1;
+    float moter_l = 1;
 
     //Right
     right_x = controller.stick(RIGHT_X);
 
-    rireg = right_x / 128;
+    creg = right_x / 332;
+    moter_h = 1 + creg;
+    moter_l = 1 - creg;
 
-    if(rireg< 
-    
-
-    
-
-     ms.send(12, 2, lf);//左前
-     ms.send(12, 3, lb);//左後
-     ms.send(23, 2, lb);//右前 
-     ms.send(23, 3, lf);//右後
+      
+     ms.send(6, 2, lf * moter_h * regulation);//左前
+     ms.send(6, 3, lb * moter_h * regulation);//左後
+     ms.send(5, 2, lb * moter_l * regulation);//右前 
+     ms.send(5, 3, lf * moter_l * regulation);//右後
   }
   cout << "プログラム終了" << endl;
   digitalWrite(RunLED, 0);
