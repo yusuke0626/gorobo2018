@@ -108,10 +108,10 @@ int main(void){
     moter_l = 1 - creg;
 
       
-     ms.send(6, 2, left_w * lf);//左前
-     ms.send(6, 3, left_w * lb);//左後
-     ms.send(5, 2, -left_w * lb);//右前 
-     ms.send(5, 3, left_w * lf);//右後
+     ms.send(6, 2,  left_w * lf * moter_l * regulation);//左前
+     ms.send(6, 3,  left_w * lb * moter_l * regulation);//左後
+     ms.send(5, 2, -left_w * lb * moter_h * regulation);//右前 
+     ms.send(5, 3,  left_w * lf * moter_h * regulation);//右後
     cout << left_w << endl;
      cout << left_w<<endl;
   }
