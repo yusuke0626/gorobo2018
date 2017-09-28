@@ -91,26 +91,22 @@ int main(void){
       lf = (left_theta * 4 / M_PI) - 7;
     }
 
-    float plus_x  = 0;
-    float minus_x = 0;
+    double right_x = 0;
 
     //Right
     right_x = controller.stick(RIGHT_X);
+
+    rireg = right_x / 128;
+
+    if(rireg< 
     
-    if(0 > right_x){
-      -(right_x / 127);
-      minus_x = -(right_x /127);
-    }else if(0 < right_x){
-      (right_x / 128);
-      plus_x = (right_x / 128);
-    }
 
     
 
-     ms.send(12, 2, (minus_x * lf));//左前
-     ms.send(12, 3, (minus_x * lb));//左後
-     ms.send(23, 2, (plus_x * lb));//右前 
-     ms.send(23, 3, (plus_x * lf));//右後
+     ms.send(12, 2, lf);//左前
+     ms.send(12, 3, lb);//左後
+     ms.send(23, 2, lb);//右前 
+     ms.send(23, 3, lf);//右後
   }
   cout << "プログラム終了" << endl;
   digitalWrite(RunLED, 0);
