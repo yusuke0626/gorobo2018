@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
-#include <time.h>
 #include "RasPiDS3/RasPiDS3.hpp"
 #include "RasPiMS/RasPiMS.hpp"
 #include <cstdio>
@@ -37,11 +36,7 @@ int main(void){
 
 
   pinMode(RunLED, OUTPUT);
-  pinMode(16, OUTPUT);
-  pinMode(19, OUTPUT);
-  pinMode(21, OUTPUT);
-
-
+  
 
   digitalWrite(RunLED, 1);
   //STARTボタンが押されるまで実行
@@ -97,6 +92,7 @@ int main(void){
     float moter_h = 1;
     float moter_l = 1;
 
+    
     //Right
     right_x = controller.stick(RIGHT_X);
 
@@ -104,12 +100,14 @@ int main(void){
     moter_h = 1 + creg;
     moter_l = 1 - creg;
 
-      
-    ms.send(6, 2,  left_w * lf * moter_l * regulation);//左前
-    ms.send(6, 3,  left_w * lb * moter_l * regulation);//左後
-    ms.send(5, 2, -left_w * lb * moter_h * regulation);//右前 
-    ms.send(5, 3,  left_w * lf * moter_h * regulation);//右後
-    cout << left_w << endl;
+    if(controller.button(RI) == 1){
+      ms.send(6, 2, right_x);
+      ms.send(6, 3, ri
+      ms.send(6, 2,  left_w * lf * moter_l * regulation);//左前
+      ms.send(6, 3,  left_w * lb * moter_l * regulation);//左後
+      ms.send(5, 2, -left_w * lb * moter_h * regulation);//右前 
+      ms.send(5, 3,  left_w * lf * moter_h * regulation);//右後
+      cout << left_w << endl;
 
   }
   cout << "プログラム終了" << endl;
