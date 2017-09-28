@@ -52,6 +52,10 @@ int main(void){
       regulation = 0.50;
     else
       regulation = 1;
+
+      if(controller.button(R1)==1){
+        printf("ok\n");
+      }
       
    //全モーターの非常停止。SELECTを押すと作動、もう一度押すと解除
     if(controller.press(SELECT)){
@@ -104,10 +108,12 @@ int main(void){
     moter_l = 1 - creg;
 
       
-     ms.send(6, 2, lf * moter_h * regulation);//左前
-     ms.send(6, 3, lb * moter_h * regulation);//左後
-     ms.send(5, 2, lb * moter_l * regulation);//右前 
-     ms.send(5, 3, lf * moter_l * regulation);//右後
+     ms.send(6, 2, left_w * lf);//左前
+     ms.send(6, 3, left_w * lb);//左後
+     ms.send(5, 2, -left_w * lb);//右前 
+     ms.send(5, 3, left_w * lf);//右後
+    cout << left_w << endl;
+     cout << left_w<<endl;
   }
   cout << "プログラム終了" << endl;
   digitalWrite(RunLED, 0);
