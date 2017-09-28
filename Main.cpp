@@ -42,20 +42,28 @@ int main(void){
   digitalWrite(RunLED, 1);
   //STARTボタンが押されるまで実行
   UPDATELOOP(controller, !(controller.button(START) && controller.button(RIGHT))){ 
-  controller2.update();
-  if(controller.button(UP)){
-    puts("1");
-  }
-  if(controller2.button(UP)){
-    puts("2");
-  }
- 
+    controller2.update();
+
+    //レギュレーション 
     if(controller.button(L1))
       regulation = 0.50;
     else
       regulation = 1;
 
-      
+    //刀y軸
+    if(controller2.button(RIGHT)){
+      ms.send(7, 2, 30);
+    }else if(controller2.button(LEFT)){
+      ms.send(7, 2, -30);
+    }
+
+    //刀z軸
+    if(controller2.button(UP)){
+      ms.send(7, 3, 30);
+    }else if(controller2.button(DOWN)){
+      ms.send(7, 3, -30);
+    }
+  
    //全モーターの非常停止。SELECTを押すと作動、もう一度押すと解除
     if(controller.press(SELECT)){
       ms.send(255, 255, 0);
@@ -109,20 +117,15 @@ int main(void){
     right_x = controller.stick(RIGHT_X);
 
     creg = right_x / 332;
+    
     moter_h = 1 + creg;
     moter_l = 1 - creg;
 
-/*
-    if(controller.button(RI) == 1){
-      ms.send(6, 2, right_x);
-      ms.send(6, 3, ri
-      ms.send(6, 2,  left_w * lf * moter_l * regulation);//左前
-      ms.send(6, 3,  left_w * lb * moter_l * regulation);//左後
-      ms.send(5, 2, -left_w * lb * moter_h * regulation);//右前 
-      ms.send(5, 3,  left_w * lf * moter_h * regulation);//右後
-      cout << left_w << endl;
-      }
-*/
+    ms.send(6, 2,  left_w * lf * moter_l * regulation);//左前
+    ms.send(6, 3,  left_w * lb * moter_l * regulation);//左後
+    ms.send(5, 2, -left_w * lb * moter_h * regulation);//右前
+    ms.send(5, 3,  left_w * lf * moter_h * regulation);//右後
+
   }
   cout << "プログラム終了" << endl;
   digitalWrite(RunLED, 0);
