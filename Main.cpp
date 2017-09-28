@@ -8,6 +8,13 @@
 #include "RasPiMS/RasPiMS.hpp"
 #include <cstdio>
 
+#define x_top 19
+#define y_top 10
+#define z_top 27
+#define x_bottom 26
+#define y_bottom 11
+#define z_bottom 17
+
 using namespace std;
 using namespace RPDS3;
 using namespace RPMS;
@@ -19,7 +26,7 @@ int main(void){
   DualShock3 controller("/dev/input/js0", false, 0);
   MotorSerial ms;
 
-  double regulation = 1;  //減速倍率
+  float regulation = 1;  //減速倍率
 
   int MAX = 250;    //PWMの最大値
   /*-------GPIOピン割り当て-------*/
@@ -39,6 +46,12 @@ int main(void){
   pinMode(RunLED, OUTPUT);
   pinMode(5, OUTPUT);
   pinMode(6, OUTPUT);
+  pinMode(x_top, INPUT);
+  pinMode(y_top, INPUT);
+  pinMode(z_top, INPUT);
+  pinMode(x_bottom, INPUT);
+  pinMode(y_bottom, INPUT);
+  pinMode(z_bottom, INPUT);
 
   digitalWrite(RunLED, 1);
   //STARTボタンが押されるまで実行
@@ -52,36 +65,74 @@ int main(void){
       regulation = 1;
 
     //刀x軸
-    int x = 0;
-    x = controller.stick(RIGHT_T);
+    int x_R2 = 0;
+    int x_L2 = 0;
 
-    ms.send(7, 4, x * 0.2);
+    if(controller.stick(RIGHT_T)){
+      if(digitalRead(x_top) == true){
+        ms.send(7, 4, 0);
+      }else{
+         ms.send(7, 4, x_R2 * 0.2);
+      }
+    }
+    
+    if(controller.stick(LEFT_T)){
+      if(digitalRead(x_bottom) == true){
+        ms.send(7, 4, 0);
+      }else{
+        ms.send(7, 4, x_L2 * -0.2);
+      } 
+    }
    
-    //刀y軸
-    if(controller2.button(RIGHT)){
-      ms.send(7, 2, 30);
-    }else if(controller2.button(LEFT)){
-      ms.send(7, 2, -30);
+   
+
+   if(controller.button(RIGHT)){
+      if(digitalRead(y_top) == true){
+        ms.send(7, 2, 0);
+      }else{
+        ms.send(7, 2, 30 * regulation);
+      }
+    }
+       
+    if(controller2.button(LEFT)){
+      if(digitalRead(y_bottom) == true){
+       ms.send(7, 2, 0);
+      }else{
+        ms.send(7, 2, -30 * regulation);
+      }
     }
 
-    //刀z軸
     if(controller2.button(UP)){
-      ms.send(7, 3, 30);
-    }else if(controller2.button(DOWN)){
-      ms.send(7, 3, -30);
+      if(digitalRead(z_top) == true){
+        ms.send(7, 3, 0);
+      }else{
+        ms.send(7, 3, 30 * regulation);
+      }
     }
+       
+    if(controller2.button(DOWN)){
+      if(digitalRead(z_bottom) == true){
+       ms.send(7, 3, 0);
+      }else{
+        ms.send(7, 3, -30 * regulation);
+      }
+    }
+
 
     if(controller.button(SQUARE)){
       digitalWrite(6, 1);
+      cout << "aaa" << endl;
     }else{
       digitalWrite(6, 0);
     }
 
     if(controller.button(CIRCLE)){
       digitalWrite(5, 1);
+      cout << "ok" <<endl;
     }else{
       digitalWrite(5, 0);
     }
+    
 
   
    //全モーターの非常停止。SELECTを押すと作動、もう一度押すと解除
@@ -136,7 +187,7 @@ int main(void){
     //Right
     right_x = controller.stick(RIGHT_X);
 
-    creg = right_x / 332;
+    creg = right_x / 255;
     
     moter_h = 1 + creg;
     moter_l = 1 - creg;
