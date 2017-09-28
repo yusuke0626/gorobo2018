@@ -62,7 +62,12 @@ int main(void){
       UPDATELOOP(controller, !controller.press(SELECT));
       cout << "SELECT" << endl;
     }
-   
+    
+    if(controller2.press(SELECT)){
+      ms.send(255, 255, 0);
+      UPDATELOOP(controller2, !controller2.press(SELECT));
+      cout << "SELECT2" << endl;
+    }
    //--------------ここから足回り(メカナムホイールによる移動)--------------
    // 左スティックによる全方位移動//
     double left_y = 0;
@@ -116,6 +121,7 @@ int main(void){
       ms.send(5, 2, -left_w * lb * moter_h * regulation);//右前 
       ms.send(5, 3,  left_w * lf * moter_h * regulation);//右後
       cout << left_w << endl;
+      }
 */
   }
   cout << "プログラム終了" << endl;
