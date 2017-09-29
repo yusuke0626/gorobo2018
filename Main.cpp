@@ -8,15 +8,6 @@
 #include "RasPiMS/RasPiMS.hpp"
 #include <cstdio>
 
-/*
-#define x_top 26
-#define y_top 11
-#define z_top 17
-#define x_bottom 19
-#define y_bottom 10
-#define z_bottom 27
-*/
-
 using namespace std;
 using namespace RPDS3;
 using namespace RPMS;
@@ -27,7 +18,8 @@ int main(void){
   DualShock3 controller("/dev/input/js0", false, 0);
   MotorSerial ms;
 
-  double regulation = 1;  //減速倍率i
+  double regulation = 1;  //減速倍率
+  double regulation2 = 1;
   bool svh = false;
   bool svl = false;
 
@@ -58,6 +50,12 @@ int main(void){
   pinMode(RunLED, OUTPUT);
   pinMode(5, OUTPUT);
   pinMode(6, OUTPUT);
+  pinMode(26,INPUT);
+  pinMode(19,INPUT);
+  pinMode(11,INPUT);
+  pinMode(10,INPUT);
+  pinMode(17,INPUT);
+  pinMode(27,INPUT);
   pinMode(23,OUTPUT);
   pinMode(24,OUTPUT);
   pinMode(x_top, INPUT);
@@ -73,33 +71,31 @@ int main(void){
     controller2.update();
 
     //レギュレーション 
-    if(controller.button(L1))
+    if(controller.button(CROSS))
       regulation = 0.50;
     else
       regulation = 1;
 
+    if(controller2.button(L1))
+      regulation2 = 0.50;
+    else
+      regulation2 = 1;
+
     //刀x軸
 
-    int right_t = controller.stick(RIGHT_T); 
-    int left_t = controller.stick(LEFT_T);
-    int x_r2 = 0;
-    int x_l2 = 0;
-    
-    x_r2 = right_t + 128;
-    x_l2 = left_t + 128;
 
     //x軸
-    if(x_r2 > 0){
+    if(controller.button(L1)){
       if(digitalRead(x_top) == true){
         ms.send(7, 4, 0);
       }else{
-        ms.send(7, 4, x_r2 * 0.2);
+        ms.send(7, 4, 20 * 0.2);
       }
-    }else if(x_l2 > 0){
+    }else if(controller.button(R1)){
       if(digitalRead(x_bottom) == true){
         ms.send(7, 4, 0);
       }else{
-        ms.send(7, 4, x_l2 * -0.2);
+        ms.send(7, 4, 20 * -0.2);
       } 
     }else{
       ms.send(7, 4, 0);
@@ -110,13 +106,13 @@ int main(void){
       if(digitalRead(y_top) == true){
         ms.send(7, 2, 0);
       }else{
-        ms.send(7, 2, 30 * regulation);
+        ms.send(7, 2, 30 * regulation2);
       }
     }else if(controller2.button(LEFT)){
       if(digitalRead(y_bottom) == true){
        ms.send(7, 2, 0);
       }else{
-        ms.send(7, 2, -30 * regulation);
+        ms.send(7, 2, -30 * regulation2);
       }
     }else{
       ms.send(7, 2, 0);
@@ -127,13 +123,13 @@ int main(void){
       if(digitalRead(z_top) == true){
         ms.send(7, 3, 0);
       }else{
-        ms.send(7, 3, 30 * regulation);
+        ms.send(7, 3, 30 * regulation2);
       }
     }else if(controller2.button(DOWN)){
       if(digitalRead(z_bottom) == true){
        ms.send(7, 3, 0);
       }else{
-        ms.send(7, 3, -30 * regulation);
+        ms.send(7, 3, -30 * regulation2);
       }
     }else{
       ms.send(7, 3, 0);
@@ -156,6 +152,7 @@ int main(void){
       digitalWrite(6, 0);
       digitalWrite(5, 0);
     }
+
 
     //電磁弁持ち上げるとこ   
      if(controller.press(CIRCLE)){
@@ -255,6 +252,9 @@ int main(void){
       left_whr = 1;
       right_whr = 1;
     }
+
+    int left_t = controller.stick(LEFT_T);
+    int right_t = controller.stick(RIGHT_T);
     
 
     if(controller.button(UP)){
@@ -277,7 +277,17 @@ int main(void){
       ms.send(6, 3, 75  *regulation);
       ms.send(5, 2, -75 *regulation);
       ms.send(5, 3, 75 *regulation);
-    }else{
+    }else if(controller.stick(RIGHT_T) + 128 > 10){
+      ms.send(6, 2, right_t * regulation);
+      ms.send(6, 3, right_t * regulation);
+      ms.send(5, 2, right_t * regulation);
+      ms.send(5, 3, right_t * regulation);
+    }else if(controller.stick(LEFT_T) + 128 > 10){
+      ms.send(6, 2, left_t * regulation);
+      ms.send(6, 3, left_t * regulation);
+      ms.send(5, 2, left_t * regulation);
+      ms.send(5, 3, left_t * regulation);
+    }else{ 
       ms.send(6, 2,  -left_w * lf * regulation * left_whr * 0.5);//左前
       ms.send(6, 3,  -left_w * lb * regulation * left_whr * 0.5);//左後
       ms.send(5, 2,  left_w * lb * regulation * right_whr * 0.5);//右前
