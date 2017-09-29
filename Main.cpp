@@ -13,7 +13,7 @@ using namespace RPDS3;
 using namespace RPMS;
 
 int main(void){
-  
+
   DualShock3 controller2("/dev/input/js1", false, 0);
   DualShock3 controller("/dev/input/js0", false, 0);
   MotorSerial ms;
@@ -21,7 +21,9 @@ int main(void){
   double regulation = 1;  //減速倍率
   double regulation2 = 1;
   bool svh = false;
-  bool svl = false;
+  bool svh2 = false;
+  bool svl3 = false;
+  bool svl4 = false;
 
   int now = 0;
   int pwm = 0;
@@ -32,23 +34,23 @@ int main(void){
   //動作確認LED
   int RunLED = 13;
   //x方向リミットスイッチ(ロボット正面の水平方向)
-  int x_top = 26;
-  int x_bottom = 19;
+  int x_top = 19;
+  int x_bottom = 26;
   //y方向リミットスイッチ(ロボット正面の垂直方向)
-  int y_top = 11;
-  int y_bottom = 10;
+  int y_top = 10;
+  int y_bottom = 11;
   //z方向リミットスイッチ(高さ方向)
-  int z_top = 17;
-  int z_bottom = 27;
+  int z_top = 27;
+  int z_bottom = 17;
   /*-------割り当てここまで-------*/
   cout << "Main start." << endl;
- //MDD通信セットアップ
+  //MDD通信セットアップ
   try{
-		ms.init();
-	}
-	catch(const char *str){
+    ms.init();
+  }
+  catch(const char *str){
     return -1;
-	}
+  }
 
 
   pinMode(RunLED, OUTPUT);
@@ -85,36 +87,36 @@ int main(void){
     else
       regulation2 = 1;
 
-    
+
     //x軸
-    if(controller.button(L1)){
+    /*if(controller.stick(LEFT_T)){
       if(digitalRead(x_top) == true){
         ms.send(7, 4, 0);
       }else{
-        ms.send(7, 4, 20 * 0.2);
+        ms.send(7, 4, 150 * regulation);
       }
-    }else if(controller.button(R1)){
+    }else if(controller.stick(RIGHT_T)){
       if(digitalRead(x_bottom) == true){
         ms.send(7, 4, 0);
       }else{
-        ms.send(7, 4, 20 * -0.2);
+        ms.send(7, 4, -150 * regulation);
       } 
     }else{
       ms.send(7, 4, 0);
-    }
-   
-   //y軸
-   if(controller2.button(RIGHT)){
+    }*/
+
+    //y軸
+    if(controller2.button(RIGHT)){
       if(digitalRead(y_top) == true){
         ms.send(7, 2, 0);
       }else{
-        ms.send(7, 2, 30 * regulation2);
+        ms.send(7, 2, 150 * regulation2);
       }
     }else if(controller2.button(LEFT)){
       if(digitalRead(y_bottom) == true){
-       ms.send(7, 2, 0);
+        ms.send(7, 2, 0);
       }else{
-        ms.send(7, 2, -30 * regulation2);
+        ms.send(7, 2, -150 * regulation2);
       }
     }else{
       ms.send(7, 2, 0);
@@ -122,21 +124,21 @@ int main(void){
 
     //z軸
     if(controller2.button(UP)){
-      if(digitalRead(z_top) == true){
+      if(digitalRead(z_top) == false){
         ms.send(7, 3, 0);
       }else{
-        ms.send(7, 3, 30 * regulation2);
+        ms.send(7, 3, -200 * regulation2);
       }
     }else if(controller2.button(DOWN)){
       if(digitalRead(z_bottom) == true){
-       ms.send(7, 3, 0);
+        ms.send(7, 3, 0);
       }else{
-        ms.send(7, 3, -30 * regulation2);
+        ms.send(7, 3, 200* regulation2);
       }
     }else{
       ms.send(7, 3, 0);
     }
-    
+
     //電磁弁つかむとこ
     if(controller2.press(CIRCLE)){
       if(svh == true){
@@ -146,62 +148,87 @@ int main(void){
       }
     }
 
-      
+
     if(svh == true){
       digitalWrite(6, 1);
-      digitalWrite(5, 1);
     }else{
       digitalWrite(6, 0);
+    }
+   
+   
+    if(controller2.press(CROSS)){
+      if(svh2 == true){
+        svh2 = false;
+      }else{
+        svh2 = true;
+      }
+    }
+
+
+    if(svh2 == true){
+      digitalWrite(5, 1);
+    }else{
       digitalWrite(5, 0);
     }
 
 
+
     //電磁弁苗木つかむとこ　 
-     if(controller2.press(R1)){
-      if(svl == true){
-        svl = false;
+    if(controller2.press(SQUARE)){
+      if(svl3 == true){
+        svl3 = false;
       }else{
-        svl = true;
+        svl3 = true;
       }
     }
-  
-    if(svl == true){
+
+    if(svl3 == true){
       digitalWrite(24, 1);
-      digitalWrite(23, 1);
     }else{
       digitalWrite(24, 0);
-      digitalWrite(23, 0);
     }
 
+    if(controller2.press(TRIANGLE)){
+      if(svl4 == true){
+        svl4 = false;
+      }else{
+        svl4 = true;
+      }
+    }
 
+    if(svl4 == true){
+      digitalWrite(23, 1);
+    }else{
+      digitalWrite(23, 0);
+    }
     
     //苗木の発射
     if(controller2.button(SQUARE))
-      ms.send(6, 4, 200);
+      ms.send(5, 4, 250);
+    else
+      ms.send(5, 4, 0);
+
+
+    if(controller2.button(TRIANGLE))
+      ms.send(6, 4, 250);
     else
       ms.send(6, 4, 0);
 
 
-    if(controller2.button(TRIANGLE))
-      ms.send(5, 4, 200);
-    else
-      ms.send(5, 4, 0);
-
-  
-   //全モーターの非常停止。SELECTを押すと作動、もう一度押すと解除
+    //全モーターの非常停止。SELECTを押すと作動、もう一度押すと解除
     if(controller.press(SELECT)){
       ms.send(255, 255, 0);
       UPDATELOOP(controller, !controller.press(SELECT));
       cout << "SELECT" << endl;
     }
-    
+
     if(controller2.press(SELECT)){
       ms.send(255, 255, 0);
       UPDATELOOP(controller2, !controller2.press(SELECT));
       cout << "SELECT2" << endl;
     }
-   //--------------ここから足回り(メカナムホイールによる移動)--------------
-   // 左スティックによる全方位移動//
+    //--------------ここから足回り(メカナムホイールによる移動)--------------
+    // 左スティックによる全方位移動//
     double left_y = 0;
     double left_x = 0;
     double left_theta = 0;
@@ -237,7 +264,7 @@ int main(void){
     double right_whr = 1;
     double left_whr = 1;
 
-    
+
     //Right
     right_x = controller.stick(RIGHT_X);
 
@@ -254,27 +281,25 @@ int main(void){
       right_whr = 1;
     }
 
-    int left_t = controller.stick(LEFT_T);
-    int right_t = controller.stick(RIGHT_T);
-    
+
     bool la;
     bool ra;
     bool ua;
     bool da;
 
     if(controller.button(UP)){
-       la = 0;
-       ra = 0;
-       ua = 1;
-       da = 0;
+      la = 0;
+      ra = 0;
+      ua = 1;
+      da = 0;
 
-       now = now + 1; 
+      now = now + 1; 
 
-     if(now >= 15){
-       pwm = 75;
-     }else{
-       pwm = now * 5;
-     }
+      if(now >= 15){
+        pwm = 75;
+      }else{
+        pwm = now * 5;
+      }
 
       ms.send(6, 2, ua * pwm * regulation);
       ms.send(6, 3, ua * pwm * regulation);
@@ -285,13 +310,13 @@ int main(void){
       ra = 0;
       ua = 0;
       da = 1;
-      
+
       now = now + 1; 
 
       if(now >= 15){
         pwm = 75;
       }else{
-       pwm = now * 5;
+        pwm = now * 5;
       }
 
       ms.send(6, 2, da * -1 * pwm * regulation);
@@ -324,8 +349,8 @@ int main(void){
       
       now = now + 1; 
 
-      if(now >= 15){
-        pwm = 75;
+      if(now >= 20){
+        pwm = 100;
       }else{
         pwm = now * 5;
       }
@@ -335,25 +360,25 @@ int main(void){
       ms.send(5, 2, la * -1 * pwm * regulation);
       ms.send(5, 3, la * pwm * regulation);
 
-    }else if(controller.stick(RIGHT_T) + 128 > 10){
-      ms.send(6, 2, right_t * regulation);
-      ms.send(6, 3, right_t * regulation);
-      ms.send(5, 2, right_t * regulation);
-      ms.send(5, 3, right_t * regulation);
-    }else if(controller.stick(LEFT_T) + 128 > 10){
-      ms.send(6, 2, -left_t * regulation);
-      ms.send(6, 3, -left_t * regulation);
-      ms.send(5, 2, -left_t * regulation);
-      ms.send(5, 3, -left_t * regulation);
+    }else if(controller.button(R1)){
+      ms.send(6, 2, 75 * regulation);
+      ms.send(6, 3, 75 * regulation);
+      ms.send(5, 2, 75 * regulation);
+      ms.send(5, 3, 75 * regulation);
+    }else if(controller.button(L1)){
+      ms.send(6, 2, -75 * regulation);
+      ms.send(6, 3, -75 * regulation);
+      ms.send(5, 2, -75 * regulation);
+      ms.send(5, 3, -75 * regulation);
     }else{ 
       pwm = 0;
       now = 0;
-      
+
       ua = 0;
       da = 0;
       la = 0;
-      ra = 0;
-      
+      ra = 0;      
+
       ms.send(6, 2,  -left_w * lf * regulation * left_whr * 0.5);//左前
       ms.send(6, 3,  -left_w * lb * regulation * left_whr * 0.5);//左後
       ms.send(5, 2,  left_w * lb * regulation * right_whr * 0.5);//右前
