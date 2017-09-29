@@ -25,7 +25,7 @@ int main(void){
   DualShock3 controller("/dev/input/js0", false, 0);
   MotorSerial ms;
 
-  float regulation = 1;  //減速倍率i
+  double regulation = 1;  //減速倍率i
   bool svh = false;
   bool svl = false;
 
@@ -174,7 +174,7 @@ int main(void){
     if(controller2.button(TRIANGLE))
       ms.send(5, 4, 200);
     else
-      ms.send(5, 4, 200);
+      ms.send(5, 4, 0);
 
   
    //全モーターの非常停止。SELECTを押すと作動、もう一度押すと解除
@@ -191,9 +191,9 @@ int main(void){
     }
    //--------------ここから足回り(メカナムホイールによる移動)--------------
    // 左スティックによる全方位移動//
-    float left_y = 0;
-    float left_x = 0;
-    float left_theta = 0;
+    double left_y = 0;
+    double left_x = 0;
+    double left_theta = 0;
     int left_w = 0;
 
     //Left
@@ -220,11 +220,11 @@ int main(void){
       lf = (left_theta * 4 / M_PI) - 7;
     }
 
-    float right_x = 0;
-    float creg = 0;
+    double right_x = 0;
+    double creg = 0;
 
-    float right_whr = 1;
-    float left_whr = 1;
+    double right_whr = 1;
+    double left_whr = 1;
 
     
     //Right
@@ -235,37 +235,40 @@ int main(void){
     if(right_x > 0){
       left_whr = 1;
       right_whr = creg;
-    }else{
+    }else if(right_x < 0){
       left_whr = creg;
+      right_whr = 1;
+    }else{
+      left_whr = 1;
       right_whr = 1;
     }
     
 
     if(controller.button(UP)){
-      ms.send(6, 2, 150  * regulation);
-      ms.send(6, 3, 150  * regulation);
-      ms.send(5, 2, -150 * regulation);
-      ms.send(5, 3, 150  * regulation);
+      ms.send(6, 2, 75  * regulation);
+      ms.send(6, 3, 75  * regulation);
+      ms.send(5, 2, -75 * regulation);
+      ms.send(5, 3, -75  * regulation);
     }else if(controller.button(DOWN)){
-      ms.send(6, 2, -150 *regulation);
-      ms.send(6, 3, -150 *regulation);
-      ms.send(5, 2, 150  *regulation);
-      ms.send(5, 3, -150 *regulation);
+      ms.send(6, 2, -75 *regulation);
+      ms.send(6, 3, -75 *regulation);
+      ms.send(5, 2, 75  *regulation);
+      ms.send(5, 3, 75 *regulation);
     }else if(controller.button(RIGHT)){
-      ms.send(6, 2,  150 *regulation);
-      ms.send(6, 3, -150 *regulation);
-      ms.send(5, 2,  150 *regulation);
-      ms.send(5, 3,  150 *regulation);
+      ms.send(6, 2,  75 *regulation);
+      ms.send(6, 3,  -75 *regulation);
+      ms.send(5, 2,  75 *regulation);
+      ms.send(5, 3,  -75 *regulation);
     }else if(controller.button(LEFT)){
-      ms.send(6, 2, -150 *regulation);
-      ms.send(6, 3, 150  *regulation);
-      ms.send(5, 2, -150 *regulation);
-      ms.send(5, 3, -150 *regulation);
+      ms.send(6, 2, -75 *regulation);
+      ms.send(6, 3, 75  *regulation);
+      ms.send(5, 2, -75 *regulation);
+      ms.send(5, 3, 75 *regulation);
     }else{
-      ms.send(6, 2,  left_w * lf * regulation * left_whr);//左前
-      ms.send(6, 3,  left_w * lb * regulation * left_whr);//左後
-      ms.send(5, 2, -left_w * lb * regulation * right_whr);//右前
-      ms.send(5, 3,  left_w * lf * regulation * right_whr);//右後
+      ms.send(6, 2,  -left_w * lf * regulation * left_whr * 0.5);//左前
+      ms.send(6, 3,  -left_w * lb * regulation * left_whr * 0.5);//左後
+      ms.send(5, 2,  left_w * lb * regulation * right_whr * 0.5);//右前
+      ms.send(5, 3,  left_w * lf * regulation * right_whr * 0.5);//右後
     }
 
   }
