@@ -283,10 +283,10 @@ int main(void){
       ms.send(5, 2, right_t * regulation);
       ms.send(5, 3, right_t * regulation);
     }else if(controller.stick(LEFT_T) + 128 > 10){
-      ms.send(6, 2, left_t * regulation);
-      ms.send(6, 3, left_t * regulation);
-      ms.send(5, 2, left_t * regulation);
-      ms.send(5, 3, left_t * regulation);
+      ms.send(6, 2, -left_t * regulation);
+      ms.send(6, 3, -left_t * regulation);
+      ms.send(5, 2, -left_t * regulation);
+      ms.send(5, 3, -left_t * regulation);
     }else{ 
       ms.send(6, 2,  -left_w * lf * regulation * left_whr * 0.5);//左前
       ms.send(6, 3,  -left_w * lb * regulation * left_whr * 0.5);//左後
