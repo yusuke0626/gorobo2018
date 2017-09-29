@@ -58,6 +58,8 @@ int main(void){
   pinMode(RunLED, OUTPUT);
   pinMode(5, OUTPUT);
   pinMode(6, OUTPUT);
+  pinMode(23,OUTPUT);
+  pinMode(24,OUTPUT);
   pinMode(x_top, INPUT);
   pinMode(y_top, INPUT);
   pinMode(z_top, INPUT);
