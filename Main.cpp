@@ -156,8 +156,8 @@ int main(void){
     }
 
 
-    //電磁弁持ち上げるとこ   
-     if(controller.press(CIRCLE)){
+    //電磁弁苗木つかむとこ　 
+     if(controller2.press(R1)){
       if(svl == true){
         svl = false;
       }else{
