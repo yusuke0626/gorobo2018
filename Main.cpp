@@ -65,10 +65,10 @@ int main(void){
       regulation = 1;
 
     //刀x軸
-    int x_R2 = 0;
-    int x_L2 = 0;
+    int x_R2 = controller.stick(RIGHT_T);
+    int x_L2 = controller.stick(LEFT_T);
 
-    if(controller.stick(RIGHT_T)){
+    if(x_R2 > 0){
       if(digitalRead(x_top) == true){
         ms.send(7, 4, 0);
       }else{
@@ -76,7 +76,7 @@ int main(void){
       }
     }
     
-    if(controller.stick(LEFT_T)){
+    if(x_L2 > 0){
       if(digitalRead(x_bottom) == true){
         ms.send(7, 4, 0);
       }else{
@@ -121,14 +121,14 @@ int main(void){
 
     if(controller.button(SQUARE)){
       digitalWrite(6, 1);
-      cout << "aaa" << endl;
+      cout << "6" << endl;
     }else{
       digitalWrite(6, 0);
     }
 
     if(controller.button(CIRCLE)){
       digitalWrite(5, 1);
-      cout << "ok" <<endl;
+      cout << "5" <<endl;
     }else{
       digitalWrite(5, 0);
     }
