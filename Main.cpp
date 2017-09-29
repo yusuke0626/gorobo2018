@@ -127,7 +127,7 @@ int main(void){
     }
     
     //電磁弁つかむとこ
-    if(controller.press(SQUARE)){
+    if(controller2.press(CIRCLE)){
       if(svh == true){
         svh = false;
       }else{
@@ -161,12 +161,21 @@ int main(void){
       digitalWrite(23, 0);
     }
 
+    cout << svh << endl;
+
     
-    //モーターで解除するやつ
-    if(controller.button(TRIANGLE))
+    //苗木の発射
+    if(controller2.button(SQUARE))
       ms.send(6, 4, 200);
-     else
+    else
       ms.send(6, 4, 0);
+
+
+    if(controller2.button(TRIANGLE))
+      ms.send(5, 4, 200);
+    else
+      ms.send(5, 4, 200);
+
   
    //全モーターの非常停止。SELECTを押すと作動、もう一度押すと解除
     if(controller.press(SELECT)){
@@ -233,25 +242,25 @@ int main(void){
     
 
     if(controller.button(UP)){
-      ms.send(6, 2, 150);
-      ms.send(6, 3, 150);
-      ms.send(5, 2, -150);
-      ms.send(5, 3, 150);
+      ms.send(6, 2, 150  * regulation);
+      ms.send(6, 3, 150  * regulation);
+      ms.send(5, 2, -150 * regulation);
+      ms.send(5, 3, 150  * regulation);
     }else if(controller.button(DOWN)){
-      ms.send(6, 2, -150);
-      ms.send(6, 3, -150);
-      ms.send(5, 2, 150);
-      ms.send(5, 3, -150);
+      ms.send(6, 2, -150 *regulation);
+      ms.send(6, 3, -150 *regulation);
+      ms.send(5, 2, 150  *regulation);
+      ms.send(5, 3, -150 *regulation);
     }else if(controller.button(RIGHT)){
-      ms.send(6, 2,  150);
-      ms.send(6, 3, -150);
-      ms.send(5, 2,  150);
-      ms.send(5, 3,  150);
+      ms.send(6, 2,  150 *regulation);
+      ms.send(6, 3, -150 *regulation);
+      ms.send(5, 2,  150 *regulation);
+      ms.send(5, 3,  150 *regulation);
     }else if(controller.button(LEFT)){
-      ms.send(6, 2, -150);
-      ms.send(6, 3, 150);
-      ms.send(5, 2, -150);
-      ms.send(5, 3, -150);
+      ms.send(6, 2, -150 *regulation);
+      ms.send(6, 3, 150  *regulation);
+      ms.send(5, 2, -150 *regulation);
+      ms.send(5, 3, -150 *regulation);
     }else{
       ms.send(6, 2,  left_w * lf * regulation * left_whr);//左前
       ms.send(6, 3,  left_w * lb * regulation * left_whr);//左後
