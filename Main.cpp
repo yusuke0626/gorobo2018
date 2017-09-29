@@ -8,17 +8,16 @@
 #include "RasPiMS/RasPiMS.hpp"
 #include <cstdio>
 
-#define x_top 19
-#define y_top 10
-#define z_top 27
-#define x_bottom 26
-#define y_bottom 11
-#define z_bottom 17
+#define x_top 26
+#define y_top 11
+#define z_top 17
+#define x_bottom 19
+#define y_bottom 10
+#define z_bottom 27
 
 using namespace std;
 using namespace RPDS3;
 using namespace RPMS;
-
 
 int main(void){
   
@@ -26,7 +25,9 @@ int main(void){
   DualShock3 controller("/dev/input/js0", false, 0);
   MotorSerial ms;
 
-  float regulation = 1;  //減速倍率
+  float regulation = 1;  //減速倍率i
+  bool svh = false;
+  bool svl = false;
 
   int MAX = 250;    //PWMの最大値
   /*-------GPIOピン割り当て-------*/
@@ -74,9 +75,6 @@ int main(void){
     x_r2 = right_t + 128;
     x_l2 = left_t + 128;
 
-    
-    cout << x_r2  << endl;
-    cout << x_l2  << endl;
     //x軸
     if(x_r2 > 0){
       if(digitalRead(x_top) == true){
@@ -128,22 +126,47 @@ int main(void){
       ms.send(7, 3, 0);
     }
     
-    //電磁弁
-    if(controller.button(SQUARE)){
+    //電磁弁つかむとこ
+    if(controller.press(SQUARE)){
+      if(svh == true){
+        svh = false;
+      }else{
+        svh = true;
+      }
+    }
+
+      
+    if(svh == true){
       digitalWrite(6, 1);
-      cout << "6" << endl;
+      digitalWrite(5, 1);
     }else{
       digitalWrite(6, 0);
-    }
-
-    if(controller.button(CIRCLE)){
-      digitalWrite(5, 1);
-      cout << "5" <<endl;
-    }else{
       digitalWrite(5, 0);
     }
-    
 
+    //電磁弁持ち上げるとこ   
+     if(controller.press(CIRCLE)){
+      if(svl == true){
+        svl = false;
+      }else{
+        svl = true;
+      }
+    }
+  
+    if(svl == true){
+      digitalWrite(24, 1);
+      digitalWrite(23, 1);
+    }else{
+      digitalWrite(24, 0);
+      digitalWrite(23, 0);
+    }
+
+    
+    //モーターで解除するやつ
+    if(controller.button(TRIANGLE))
+      ms.send(6, 4, 200);
+     else
+      ms.send(6, 4, 0);
   
    //全モーターの非常停止。SELECTを押すと作動、もう一度押すと解除
     if(controller.press(SELECT)){
@@ -159,9 +182,9 @@ int main(void){
     }
    //--------------ここから足回り(メカナムホイールによる移動)--------------
    // 左スティックによる全方位移動//
-    double left_y = 0;
-    double left_x = 0;
-    double left_theta = 0;
+    float left_y = 0;
+    float left_x = 0;
+    float left_theta = 0;
     int left_w = 0;
 
     //Left
@@ -171,7 +194,7 @@ int main(void){
     if(left_w > MAX)
       left_w = MAX;
 
-    double lb, lf;
+    float lb, lf;
     left_theta = (atan2(-left_y, left_x) + M_PI);
 
     if(left_theta >= 0 && left_theta <= (M_PI/2)){
@@ -190,22 +213,51 @@ int main(void){
 
     float right_x = 0;
     float creg = 0;
-    float moter_h = 1;
-    float moter_l = 1;
+
+    float right_whr = 1;
+    float left_whr = 1;
 
     
     //Right
     right_x = controller.stick(RIGHT_X);
 
-    creg = right_x / 255;
-    
-    moter_h = 1 + creg;
-    moter_l = 1 - creg;
+    creg = fabs(right_x / 256);
 
-    ms.send(6, 2,  left_w * lf * moter_l * regulation);//左前
-    ms.send(6, 3,  left_w * lb * moter_l * regulation);//左後
-    ms.send(5, 2, -left_w * lb * moter_h * regulation);//右前
-    ms.send(5, 3,  left_w * lf * moter_h * regulation);//右後
+    if(right_x > 0){
+      left_whr = 1;
+      right_whr = creg;
+    }else{
+      left_whr = creg;
+      right_whr = 1;
+    }
+    
+
+    if(controller.button(UP)){
+      ms.send(6, 2, 150);
+      ms.send(6, 3, 150);
+      ms.send(5, 2, -150);
+      ms.send(5, 3, 150);
+    }else if(controller.button(DOWN)){
+      ms.send(6, 2, -150);
+      ms.send(6, 3, -150);
+      ms.send(5, 2, 150);
+      ms.send(5, 3, -150);
+    }else if(controller.button(RIGHT)){
+      ms.send(6, 2,  150);
+      ms.send(6, 3, -150);
+      ms.send(5, 2,  150);
+      ms.send(5, 3,  150);
+    }else if(controller.button(LEFT)){
+      ms.send(6, 2, -150);
+      ms.send(6, 3, 150);
+      ms.send(5, 2, -150);
+      ms.send(5, 3, -150);
+    }else{
+      ms.send(6, 2,  left_w * lf * regulation * left_whr);//左前
+      ms.send(6, 3,  left_w * lb * regulation * left_whr);//左後
+      ms.send(5, 2, -left_w * lb * regulation * right_whr);//右前
+      ms.send(5, 3,  left_w * lf * regulation * right_whr);//右後
+    }
 
   }
   cout << "プログラム終了" << endl;
