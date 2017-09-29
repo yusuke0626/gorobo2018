@@ -84,24 +84,7 @@ int main(void){
       regulation2 = 0.50;
     else
       regulation2 = 1;
-/*--------------時間関係------------------------------------------*/
 
-   if(controller.button(SQUARE)){
-     now = now + 1; 
-
-     if(now >= 15){
-       pwm = 75;
-     }else{
-       pwm = now * 5;
-     }
-   }else{
-     pwm = 0;
-     now = 0;
-   }
-
-    cout << pwm << endl;
-
-/*----------------------------------------------------------------*/
     
     //x軸
     if(controller.button(L1)){
