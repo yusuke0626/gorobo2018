@@ -65,60 +65,70 @@ int main(void){
       regulation = 1;
 
     //刀x軸
-    int x_R2 = controller.stick(RIGHT_T);
-    int x_L2 = controller.stick(LEFT_T);
 
-    if(x_R2 > 0){
+    int right_t = controller.stick(RIGHT_T); 
+    int left_t = controller.stick(LEFT_T);
+    int x_r2 = 0;
+    int x_l2 = 0;
+    
+    x_r2 = right_t + 128;
+    x_l2 = left_t + 128;
+
+    
+    cout << x_r2  << endl;
+    cout << x_l2  << endl;
+    //x軸
+    if(x_r2 > 0){
       if(digitalRead(x_top) == true){
         ms.send(7, 4, 0);
       }else{
-         ms.send(7, 4, x_R2 * 0.2);
+        ms.send(7, 4, x_r2 * 0.2);
       }
-    }
-    
-    if(x_L2 > 0){
+    }else if(x_l2 > 0){
       if(digitalRead(x_bottom) == true){
         ms.send(7, 4, 0);
       }else{
-        ms.send(7, 4, x_L2 * -0.2);
+        ms.send(7, 4, x_l2 * -0.2);
       } 
+    }else{
+      ms.send(7, 4, 0);
     }
    
-   
-
-   if(controller.button(RIGHT)){
+   //y軸
+   if(controller2.button(RIGHT)){
       if(digitalRead(y_top) == true){
         ms.send(7, 2, 0);
       }else{
         ms.send(7, 2, 30 * regulation);
       }
-    }
-       
-    if(controller2.button(LEFT)){
+    }else if(controller2.button(LEFT)){
       if(digitalRead(y_bottom) == true){
        ms.send(7, 2, 0);
       }else{
         ms.send(7, 2, -30 * regulation);
       }
+    }else{
+      ms.send(7, 2, 0);
     }
 
+    //z軸
     if(controller2.button(UP)){
       if(digitalRead(z_top) == true){
         ms.send(7, 3, 0);
       }else{
         ms.send(7, 3, 30 * regulation);
       }
-    }
-       
-    if(controller2.button(DOWN)){
+    }else if(controller2.button(DOWN)){
       if(digitalRead(z_bottom) == true){
        ms.send(7, 3, 0);
       }else{
         ms.send(7, 3, -30 * regulation);
       }
+    }else{
+      ms.send(7, 3, 0);
     }
-
-
+    
+    //電磁弁
     if(controller.button(SQUARE)){
       digitalWrite(6, 1);
       cout << "6" << endl;
