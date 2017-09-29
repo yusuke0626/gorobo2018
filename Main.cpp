@@ -23,6 +23,10 @@ int main(void){
   bool svh = false;
   bool svl = false;
 
+  int now = 0;
+  int pwm = 0;
+
+
   int MAX = 250;    //PWMの最大値
   /*-------GPIOピン割り当て-------*/
   //動作確認LED
@@ -80,10 +84,25 @@ int main(void){
       regulation2 = 0.50;
     else
       regulation2 = 1;
+/*--------------時間関係------------------------------------------*/
 
-    //刀x軸
+   if(controller.button(SQUARE)){
+     now = now + 1; 
 
+     if(now >= 15){
+       pwm = 75;
+     }else{
+       pwm = now * 5;
+     }
+   }else{
+     pwm = 0;
+     now = 0;
+   }
 
+    cout << pwm << endl;
+
+/*----------------------------------------------------------------*/
+    
     //x軸
     if(controller.button(L1)){
       if(digitalRead(x_top) == true){
@@ -171,7 +190,6 @@ int main(void){
       digitalWrite(23, 0);
     }
 
-    cout << svh << endl;
 
     
     //苗木の発射
@@ -256,27 +274,84 @@ int main(void){
     int left_t = controller.stick(LEFT_T);
     int right_t = controller.stick(RIGHT_T);
     
+    bool la;
+    bool ra;
+    bool ua;
+    bool da;
 
     if(controller.button(UP)){
-      ms.send(6, 2, 75  * regulation);
-      ms.send(6, 3, 75  * regulation);
-      ms.send(5, 2, -75 * regulation);
-      ms.send(5, 3, -75  * regulation);
+       la = 0;
+       ra = 0;
+       ua = 1;
+       da = 0;
+
+       now = now + 1; 
+
+     if(now >= 15){
+       pwm = 75;
+     }else{
+       pwm = now * 5;
+     }
+
+      ms.send(6, 2, ua * pwm * regulation);
+      ms.send(6, 3, ua * pwm * regulation);
+      ms.send(5, 2, ua * -1 * pwm * regulation);
+      ms.send(5, 3, ua * -1 * pwm * regulation);
     }else if(controller.button(DOWN)){
-      ms.send(6, 2, -75 *regulation);
-      ms.send(6, 3, -75 *regulation);
-      ms.send(5, 2, 75  *regulation);
-      ms.send(5, 3, 75 *regulation);
+      la = 0;
+      ra = 0;
+      ua = 0;
+      da = 1;
+      
+      now = now + 1; 
+
+      if(now >= 15){
+        pwm = 75;
+      }else{
+       pwm = now * 5;
+      }
+
+      ms.send(6, 2, da * -1 * pwm * regulation);
+      ms.send(6, 3, da * -1 * pwm * regulation);
+      ms.send(5, 2, da * pwm * regulation);
+      ms.send(5, 3, da * pwm * regulation);
     }else if(controller.button(RIGHT)){
-      ms.send(6, 2,  75 *regulation);
-      ms.send(6, 3,  -75 *regulation);
-      ms.send(5, 2,  75 *regulation);
-      ms.send(5, 3,  -75 *regulation);
+      la = 0;
+      ra = 1;
+      ua = 0;
+      da = 0;
+
+      now = now + 1; 
+
+      if(now >= 15){
+        pwm = 75;
+      }else{
+        pwm = now * 5;
+      }
+
+      ms.send(6, 2, ra * pwm * regulation);
+      ms.send(6, 3, ra * -1 * pwm * regulation);
+      ms.send(5, 2, ra * pwm * regulation);
+      ms.send(5, 3, ra * -1 * pwm * regulation);
     }else if(controller.button(LEFT)){
-      ms.send(6, 2, -75 *regulation);
-      ms.send(6, 3, 75  *regulation);
-      ms.send(5, 2, -75 *regulation);
-      ms.send(5, 3, 75 *regulation);
+      la = 1;
+      ra = 0;
+      ua = 0;
+      da = 0;
+      
+      now = now + 1; 
+
+      if(now >= 15){
+        pwm = 75;
+      }else{
+        pwm = now * 5;
+      }
+
+      ms.send(6, 2, la * -1 * pwm * regulation);
+      ms.send(6, 3, la * pwm * regulation);
+      ms.send(5, 2, la * -1 * pwm * regulation);
+      ms.send(5, 3, la * pwm * regulation);
+
     }else if(controller.stick(RIGHT_T) + 128 > 10){
       ms.send(6, 2, right_t * regulation);
       ms.send(6, 3, right_t * regulation);
@@ -288,6 +363,14 @@ int main(void){
       ms.send(5, 2, -left_t * regulation);
       ms.send(5, 3, -left_t * regulation);
     }else{ 
+      pwm = 0;
+      now = 0;
+      
+      ua = 0;
+      da = 0;
+      la = 0;
+      ra = 0;
+      
       ms.send(6, 2,  -left_w * lf * regulation * left_whr * 0.5);//左前
       ms.send(6, 3,  -left_w * lb * regulation * left_whr * 0.5);//左後
       ms.send(5, 2,  left_w * lb * regulation * right_whr * 0.5);//右前
@@ -300,5 +383,3 @@ int main(void){
   digitalWrite(19, 0);
   return 0;
 }
-
-
