@@ -89,21 +89,13 @@ int main(void){
 
 
     //x軸
-    /*if(controller.stick(LEFT_T)){
-      if(digitalRead(x_top) == true){
-        ms.send(7, 4, 0);
-      }else{
+    if(controller.button(CIRCLE)){
         ms.send(7, 4, 150 * regulation);
-      }
-    }else if(controller.stick(RIGHT_T)){
-      if(digitalRead(x_bottom) == true){
-        ms.send(7, 4, 0);
-      }else{
+      }else if(controller.button(SQUARE)){
         ms.send(7, 4, -150 * regulation);
-      } 
-    }else{
+      }else{
       ms.send(7, 4, 0);
-    }*/
+    }
 
     //y軸
     if(controller2.button(RIGHT)){
@@ -140,7 +132,7 @@ int main(void){
     }
 
     //電磁弁つかむとこ
-    if(controller2.press(CIRCLE)){
+    if(controller2.press(CROSS)){
       if(svh == true){
         svh = false;
       }else{
@@ -156,7 +148,7 @@ int main(void){
     }
    
    
-    if(controller2.press(CROSS)){
+    if(controller2.press(CIRCLE)){
       if(svh2 == true){
         svh2 = false;
       }else{
@@ -174,7 +166,7 @@ int main(void){
 
 
     //電磁弁苗木つかむとこ　 
-    if(controller2.press(SQUARE)){
+    if(controller2.press(R1)){
       if(svl3 == true){
         svl3 = false;
       }else{
@@ -188,7 +180,7 @@ int main(void){
       digitalWrite(24, 0);
     }
 
-    if(controller2.press(TRIANGLE)){
+    if(controller2.press(R1)){
       if(svl4 == true){
         svl4 = false;
       }else{
