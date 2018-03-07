@@ -8,12 +8,14 @@
 #include "RasPiMS/RasPiMS.hpp"
 #include <cstdio>
 
+/*
 #define x_top 26
 #define y_top 11
 #define z_top 17
 #define x_bottom 19
 #define y_bottom 10
 #define z_bottom 27
+*/
 
 using namespace std;
 using namespace RPDS3;
@@ -33,6 +35,15 @@ int main(void){
   /*-------GPIOピン割り当て-------*/
   //動作確認LED
   int RunLED = 13;
+  //x方向リミットスイッチ(ロボット正面の水平方向)
+  int x_top = 26;
+  int x_bottom = 19;
+  //y方向リミットスイッチ(ロボット正面の垂直方向)
+  int y_top = 11;
+  int y_bottom = 10;
+  //z方向リミットスイッチ(高さ方向)
+  int z_top = 17;
+  int z_bottom = 27;
   /*-------割り当てここまで-------*/
   cout << "Main start." << endl;
  //MDD通信セットアップ
