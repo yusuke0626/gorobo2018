@@ -91,13 +91,13 @@ int main(void){
       if(digitalRead(x_top) == true){
         ms.send(7, 4, 0);
       }else{
-        ms.send(7, 4, 20 * 0.2);
+        ms.send(7, 4, 20 * regulation);
       }
     }else if(controller.button(R1)){
       if(digitalRead(x_bottom) == true){
         ms.send(7, 4, 0);
       }else{
-        ms.send(7, 4, 20 * -0.2);
+        ms.send(7, 4, -20 * regulation);
       } 
     }else{
       ms.send(7, 4, 0);
