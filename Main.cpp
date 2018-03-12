@@ -32,14 +32,14 @@ int main(void){
   //動作確認LED
   int RunLED = 13;
   //x方向リミットスイッチ(ロボット正面の水平方向)
-  int x_top = 26;
-  int x_bottom = 19;
+  int x_top = 19;
+  int x_bottom = 26;
   //y方向リミットスイッチ(ロボット正面の垂直方向)
-  int y_top = 11;
-  int y_bottom = 10;
+  int y_top = 10;
+  int y_bottom = 11;
   //z方向リミットスイッチ(高さ方向)
-  int z_top = 17;
-  int z_bottom = 27;
+  int z_top = 27;
+  int z_bottom = 17;
   /*-------割り当てここまで-------*/
   cout << "Main start." << endl;
  //MDD通信セットアップ
@@ -91,13 +91,13 @@ int main(void){
       if(digitalRead(x_top) == true){
         ms.send(7, 4, 0);
       }else{
-        ms.send(7, 4, 20 * regulation);
+        ms.send(7, 4, 40 * regulation);
       }
     }else if(controller.button(R1)){
       if(digitalRead(x_bottom) == true){
         ms.send(7, 4, 0);
       }else{
-        ms.send(7, 4, -20 * regulation);
+        ms.send(7, 4, -40 * regulation);
       } 
     }else{
       ms.send(7, 4, 0);
@@ -108,13 +108,13 @@ int main(void){
       if(digitalRead(y_top) == true){
         ms.send(7, 2, 0);
       }else{
-        ms.send(7, 2, 30 * regulation2);
+        ms.send(7, 2, 50 * regulation2);
       }
     }else if(controller2.button(LEFT)){
       if(digitalRead(y_bottom) == true){
        ms.send(7, 2, 0);
       }else{
-        ms.send(7, 2, -30 * regulation2);
+        ms.send(7, 2, -50 * regulation2);
       }
     }else{
       ms.send(7, 2, 0);
@@ -125,13 +125,13 @@ int main(void){
       if(digitalRead(z_top) == true){
         ms.send(7, 3, 0);
       }else{
-        ms.send(7, 3, 30 * regulation2);
+        ms.send(7, 3, 200 * regulation2);
       }
     }else if(controller2.button(DOWN)){
       if(digitalRead(z_bottom) == true){
        ms.send(7, 3, 0);
       }else{
-        ms.send(7, 3, -30 * regulation2);
+        ms.send(7, 3, -200* regulation2);
       }
     }else{
       ms.send(7, 3, 0);
@@ -177,13 +177,13 @@ int main(void){
     
     //苗木の発射
     if(controller2.button(SQUARE))
-      ms.send(6, 4, 200);
+      ms.send(6, 4, 250);
     else
       ms.send(6, 4, 0);
 
 
     if(controller2.button(TRIANGLE))
-      ms.send(5, 4, 200);
+      ms.send(5, 4, 250);
     else
       ms.send(5, 4, 0);
 
@@ -261,13 +261,17 @@ int main(void){
     bool ra;
     bool ua;
     bool da;
+    bool rt;
+    bool lt;
 
     if(controller.button(UP)){
        la = 0;
        ra = 0;
        ua = 1;
        da = 0;
-
+       rt = 0;
+       lt = 0;
+	    
        now = now + 1; 
 
      if(now >= 15){
@@ -285,6 +289,8 @@ int main(void){
       ra = 0;
       ua = 0;
       da = 1;
+      rt = 0;
+      lt = 0;
       
       now = now + 1; 
 
@@ -303,6 +309,8 @@ int main(void){
       ra = 1;
       ua = 0;
       da = 0;
+      rt = 0;
+      lt = 0;
 
       now = now + 1; 
 
@@ -321,11 +329,12 @@ int main(void){
       ra = 0;
       ua = 0;
       da = 0;
-      
+      rt = 0;
+      lt = 0;
       now = now + 1; 
 
-      if(now >= 15){
-        pwm = 75;
+      if(now >= 20){
+        pwm = 100;
       }else{
         pwm = now * 5;
       }
@@ -336,15 +345,22 @@ int main(void){
       ms.send(5, 3, la * pwm * regulation);
 
     }else if(controller.stick(RIGHT_T) + 128 > 10){
-      ms.send(6, 2, right_t * regulation);
-      ms.send(6, 3, right_t * regulation);
-      ms.send(5, 2, right_t * regulation);
-      ms.send(5, 3, right_t * regulation);
+      la = 0;
+      ra = 0;
+      ua = 0;
+      da = 0;
+      rt = 1;
+      lt = 0;
+	    
+      ms.send(6, 2, rt * right_t * regulation);
+      ms.send(6, 3, rt * right_t * regulation);
+      ms.send(5, 2, rt * right_t * regulation);
+      ms.send(5, 3, rt * right_t * regulation);
     }else if(controller.stick(LEFT_T) + 128 > 10){
-      ms.send(6, 2, -left_t * regulation);
-      ms.send(6, 3, -left_t * regulation);
-      ms.send(5, 2, -left_t * regulation);
-      ms.send(5, 3, -left_t * regulation);
+      ms.send(6, 2, lt * -left_t * regulation);
+      ms.send(6, 3, lt * -left_t * regulation);
+      ms.send(5, 2, lt * -left_t * regulation);
+      ms.send(5, 3, lt * -left_t * regulation);
     }else{ 
       pwm = 0;
       now = 0;
@@ -352,8 +368,10 @@ int main(void){
       ua = 0;
       da = 0;
       la = 0;
-      ra = 0;
-      
+      ra = 0;      
+      rt = 0;
+      lt = 0;
+
       ms.send(6, 2,  -left_w * lf * regulation * left_whr * 0.5);//左前
       ms.send(6, 3,  -left_w * lb * regulation * left_whr * 0.5);//左後
       ms.send(5, 2,  left_w * lb * regulation * right_whr * 0.5);//右前
